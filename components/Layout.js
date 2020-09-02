@@ -10,7 +10,7 @@ import Alert from "./Alert";
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { showAlert, closeAlert, logout } from '../store';
+import { showAlert, closeAlert } from '../store';
 import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
@@ -70,11 +70,11 @@ export function Layout(props) {
 }
 
 function mapStateToProps(state) {
-  const { displayAlert, currentCart, user, isLoggedIn } = state
-  return { displayAlert, currentCart, user, isLoggedIn }
+  const { displayAlert } = state
+  return { displayAlert }
 }
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ closeAlert, logout, showAlert }, dispatch)
+  bindActionCreators({ closeAlert, showAlert }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);

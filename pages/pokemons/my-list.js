@@ -21,7 +21,7 @@ const useStyles = makeStyles({
 
 function Order(props) {
   const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
+  const [pokemonList, setPokemonList] = useState([]);
   const classes = useStyles();
 
   // const fetchMyPokemonList = async () => {
@@ -30,7 +30,7 @@ function Order(props) {
   //     userId: props.user.id,
   //     token: props.user.token
   //   });
-  //   setOrders(json.data);
+  //   setPokemonList(json.data);
   //   setLoading(false);
   // };
 
@@ -42,80 +42,64 @@ function Order(props) {
 
   return (
     <>
-      <Typography gutterBottom variant="h5" component="h2">
-        {props.isLoggedIn
-          ? `Hi ${props.user.name}, this is your last 5 order history:`
-          : 
-          <Link
-            href={`/login`}
-            as={`/login`}
-          >
-            <a>
-              You need to login to see your order history.
-            </a>
-          </Link>
-        }
-      </Typography>
-      {props.isLoggedIn && (
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="right">Order Date</TableCell>
-                <TableCell>Item(s)</TableCell>
-                <TableCell align="right">Status</TableCell>
-                <TableCell align="right">Total Items</TableCell>
-                <TableCell align="right">Delivery Cost</TableCell>
-                <TableCell align="right">Final Price</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {!loading && orders.length > 0 ? (
-                orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell align="right">{order.created_at}</TableCell>
-                    <TableCell component="th" scope="row">
-                      <ul>
-                        {order.items.map((item) => (
-                          <li>
-                            <Link
-                              href={`/products/[id]`}
-                              as={`/products/${item.id}`}
-                            >
-                              <a>
-                                {item.name}: {item.total} pc(s) - $
-                                {item.unit_price}
-                              </a>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </TableCell>
-                    <TableCell align="right">{order.status}</TableCell>
-                    <TableCell align="right">{order.total_items}</TableCell>
-                    <TableCell align="right">
-                      ${order.delivery_cost_in_usd}
-                    </TableCell>
-                    <TableCell align="right">
-                      ${order.final_price_in_usd}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell align="center" colSpan={5}>
-                    {loading ? (
-                      <CircularProgress />
-                    ) : (
-                      `You don't have any order`
-                    )}
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="right">Order Date</TableCell>
+              <TableCell>Item(s)</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Total Items</TableCell>
+              <TableCell align="right">Delivery Cost</TableCell>
+              <TableCell align="right">Final Price</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {!loading && pokemonList.length > 0 ? (
+              pokemonList.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell align="right">{order.created_at}</TableCell>
+                  <TableCell component="th" scope="row">
+                    <ul>
+                      {order.items.map((item) => (
+                        <li>
+                          <Link
+                            href={`/products/[id]`}
+                            as={`/products/${item.id}`}
+                          >
+                            <a>
+                              {item.name}: {item.total} pc(s) - $
+                              {item.unit_price}
+                            </a>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell align="right">{order.status}</TableCell>
+                  <TableCell align="right">{order.total_items}</TableCell>
+                  <TableCell align="right">
+                    ${order.delivery_cost_in_usd}
+                  </TableCell>
+                  <TableCell align="right">
+                    ${order.final_price_in_usd}
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell align="center" colSpan={6}>
+                  {loading ? (
+                    <CircularProgress />
+                  ) : (
+                    `You don't have any pokemon`
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   );
 }
