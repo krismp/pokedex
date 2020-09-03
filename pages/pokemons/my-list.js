@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Router from 'next/router';
 import Link from "next/link";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -38,6 +39,7 @@ function MyList(props) {
       severity: "success",
     });
     setLoading(false);
+    Router.push('/pokemons/my-list')
   }
 
   return (
@@ -51,7 +53,6 @@ function MyList(props) {
       {pokemons.length > 0 && (
         pokemons.map((pokemon) => (
           <Grid item xs={12} lg={4} key={pokemon.id}>
-            <Link href={`/pokemons/[name]`} as={`/pokemons/${pokemon.name}`}>
               <Card>
                 <CardActionArea>
                   <CardMedia
@@ -71,7 +72,9 @@ function MyList(props) {
                     >
                       <Grid item>
                         <Typography gutterBottom variant="h5" component="h2">
-                          {pokemon.name.toUpperCase()}
+                          <Link href={`/pokemons/[name]`} as={`/pokemons/${pokemon.name}`}>
+                            {pokemon.name.toUpperCase()}
+                          </Link>
                         </Typography>
                       </Grid>
                     </Grid>
@@ -103,7 +106,6 @@ function MyList(props) {
                   </CardActions>
                 </CardActionArea>
               </Card>
-            </Link>
           </Grid>
         ))
       )}
