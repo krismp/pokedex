@@ -13,7 +13,6 @@ const exampleInitialState = {
 }
 
 export const actionTypes = {
-  CATCH_POKEMON: 'CATCH_POKEMON',
   SHOW_ALERT: 'SHOW_ALERT',
   CLOSE_ALERT: 'CLOSE_ALERT',
 }
@@ -21,12 +20,6 @@ export const actionTypes = {
 // REDUCERS
 export const reducer = (state = exampleInitialState, action) => {
   switch (action.type) {
-    case actionTypes.CATCH_POKEMON:
-      return {
-        ...state,
-        currentCart: state.currentCart + 1,
-        cartId: action.data.cart_id
-      }
     case actionTypes.SHOW_ALERT:
       return {
         ...state,
@@ -53,9 +46,6 @@ export const reducer = (state = exampleInitialState, action) => {
 }
 
 // ACTIONS
-export const catchPokemon = (data) => {
-  return { type: actionTypes.CATCH_POKEMON, data }
-}
 
 export const showAlert = (data) => {
   return { type: actionTypes.SHOW_ALERT, data }

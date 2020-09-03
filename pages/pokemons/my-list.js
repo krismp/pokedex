@@ -1,112 +1,127 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import Grid from "@material-ui/core/Grid";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Button from '@material-ui/core/Button';
+import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 import { connect } from "react-redux";
-import { getMyPokemonList } from "../../lib/api";
+import { bindActionCreators } from "redux";
+import { getMyPokemonList, getPokemonImage, releasePokemon } from "../../lib/api";
+import { showAlert } from "../../store";
 
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
+  link: {
+    textDecoration: 'none',
+    textTransform: "capitalize"
+  }
 });
 
-function Order(props) {
+function MyList(props) {
   const [loading, setLoading] = useState(false);
-  const [pokemonList, setPokemonList] = useState([]);
   const classes = useStyles();
+  const { pokemons, dispatchShowAlert } = props;
 
-  // const fetchMyPokemonList = async () => {
-  //   setLoading(true);
-  //   const json = await getMyPokemonList({
-  //     userId: props.user.id,
-  //     token: props.user.token
-  //   });
-  //   setPokemonList(json.data);
-  //   setLoading(false);
-  // };
-
-  // useEffect(() => {
-  //   if (props.isLoggedIn) {
-  //     fetchMyPokemonList();
-  //   }
-  // }, []);
+  async function releasePokemonHandler(pokemon) {
+    setLoading(true);
+    await releasePokemon(pokemon.id);
+    dispatchShowAlert({
+      message: `${pokemon.name} has been successfully released!`,
+      severity: "success",
+    });
+    setLoading(false);
+  }
 
   return (
-    <>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="right">Order Date</TableCell>
-              <TableCell>Item(s)</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Total Items</TableCell>
-              <TableCell align="right">Delivery Cost</TableCell>
-              <TableCell align="right">Final Price</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!loading && pokemonList.length > 0 ? (
-              pokemonList.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell align="right">{order.created_at}</TableCell>
-                  <TableCell component="th" scope="row">
-                    <ul>
-                      {order.items.map((item) => (
-                        <li>
-                          <Link
-                            href={`/products/[id]`}
-                            as={`/products/${item.id}`}
-                          >
-                            <a>
-                              {item.name}: {item.total} pc(s) - $
-                              {item.unit_price}
-                            </a>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </TableCell>
-                  <TableCell align="right">{order.status}</TableCell>
-                  <TableCell align="right">{order.total_items}</TableCell>
-                  <TableCell align="right">
-                    ${order.delivery_cost_in_usd}
-                  </TableCell>
-                  <TableCell align="right">
-                    ${order.final_price_in_usd}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell align="center" colSpan={6}>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    `You don't have any pokemon`
-                  )}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+    <Grid
+      container
+      direction="row"
+      justify="space-around"
+      alignItems="center"
+      spacing={5}
+    >
+      {pokemons.length > 0 && (
+        pokemons.map((pokemon) => (
+          <Grid item xs={12} lg={4} key={pokemon.id}>
+            <Link href={`/pokemons/[name]`} as={`/pokemons/${pokemon.name}`}>
+              <Card>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    alt={pokemon.name}
+                    image={getPokemonImage(pokemon.pokemon_id)}
+                    title={pokemon.name}
+                    className={classes.media}
+                    height="20%"
+                  />
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="column"
+                      justify="space-between"
+                      alignItems="center"
+                    >
+                      <Grid item>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          {pokemon.name.toUpperCase()}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                      {pokemon.detail}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Grid
+                      container
+                      direction="row"
+                      justify="flex-end"
+                      alignItems="center"
+                    >
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          size="small"
+                          className={classes.button}
+                          startIcon={<DirectionsRunIcon />}
+                          onClick={() => releasePokemonHandler(pokemon)}
+                          disabled={loading}
+                        >
+                          { loading ? `Releasing ${pokemon.name} ...` : `Release this pokemon`}
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </CardActions>
+                </CardActionArea>
+              </Card>
+            </Link>
+          </Grid>
+        ))
+      )}
+    </Grid>
   );
 }
 
-function mapStateToProps(state) {
-  const { user, isLoggedIn } = state;
-  return { user, isLoggedIn };
+export async function getServerSideProps() {
+  const json = await getMyPokemonList();
+
+  return {
+    props: {
+      pokemons: json
+    }
+  }
 }
 
-export default connect(mapStateToProps)(Order);
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators({ dispatchShowAlert: showAlert }, dispatch);
+
+export default connect(null, mapDispatchToProps)(MyList);

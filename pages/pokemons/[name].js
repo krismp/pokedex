@@ -10,19 +10,11 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { catchPokemon, showAlert } from "../../store";
+import { showAlert } from "../../store";
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import { getPokemonDetail, postCatchPokemon, getPokemonImage } from "../../lib/api";
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import SendIcon from '@material-ui/icons/Send';
+import PokemonInfo from "../../components/PokemonInfo";
 
 const useStyles = makeStyles((theme) => ({
   media: {
@@ -31,69 +23,34 @@ const useStyles = makeStyles((theme) => ({
     margin: `0 auto`,
     padding: '10px'
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    flexBasis: '33.33%',
-    flexShrink: 0,
-  },
-  table: {
-    minWidth: 650,
-  },
-  listItem: {
-    textTransform: `capitalize`
-  }
 }));
 
 function PokemonDetail(props) {
   const classes = useStyles();
 
   const [loading, setLoading] = useState(false);
-  const { pokemon, cartId, dispatchShowAlert, dispatchCatchPokemon, user } = props;
-  const [expanded, setExpanded] = useState(false);
+  const { pokemon, dispatchShowAlert } = props;
 
-  function handleChange(panel) {
-    return (event, isExpanded) => {
-      setExpanded(isExpanded ? panel : false);
-    };
-  }
-
-  async function handleCatchPokemon() {
+  async function handleCatchPokemon(pokemon) {
     setLoading(true);
-    const data = await postCatchPokemon({
-      userId: user.id,
-      cartId: cartId,
-      productId: pokemon.id,
-      total: 1,
-      price: parseFloat(pokemon.price_in_usd),
-    });
-    setLoading(false);
-    if (data.success) {
-      dispatchShowAlert({
-        message: data.message,
-        severity: "success",
+    await setTimeout(async () => { 
+      const data = await postCatchPokemon({ 
+        pokemonId: pokemon.id,
+        name: pokemon.name
       });
-      dispatchCatchPokemon(data.data);
-    } else {
-      const mainMessage = data.message;
-      const message = Object.keys(data.data).map((err) => {
-        return (
-          <>
-            {data.data[err].map((e) => {
-              return <li>{e}</li>;
-            })}
-          </>
-        );
-      });
-      dispatchShowAlert({
-        message: (
-          <>
-            <p>{mainMessage}</p>
-            <ul>{message}</ul>
-          </>
-        ),
-        severity: "error",
-      });
-    }
+      if (data) {
+        dispatchShowAlert({
+          message: `${pokemon.name} has been successfully catched!`,
+          severity: "success",
+        });
+      } else {
+        dispatchShowAlert({
+          message: `${pokemon.name} got away! Try again, don't give up!`,
+          severity: "warning",
+        });
+      }
+      setLoading(false);
+    }, 3000);
   }
 
   return (
@@ -120,48 +77,7 @@ function PokemonDetail(props) {
               </Typography>
             </Grid>
             <Grid item>
-              <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1bh-content"
-                  id="panel1bh-header"
-                >
-                  <Typography className={classes.heading}>Moves</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List component="nav" className={classes.root} aria-label="contacts">
-                    {pokemon.moves.map(move => {
-                      return <ListItem button key={move.move.name}>
-                        <ListItemIcon>
-                          <SendIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={move.move.name} className={classes.listItem} />
-                      </ListItem>
-                    })}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>Types</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List component="nav" className={classes.root} aria-label="contacts">
-                    {pokemon.types.map(type => {
-                      return <ListItem button key={type.slot}>
-                        <ListItemIcon>
-                          <SendIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={type.type.name} className={classes.listItem} />
-                      </ListItem>
-                    })}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
+              <PokemonInfo pokemon={pokemon} />
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="p">
@@ -183,7 +99,8 @@ function PokemonDetail(props) {
                 startIcon={
                   loading ? <HourglassEmptyIcon /> : <CropFreeIcon />
                 }
-                onClick={handleCatchPokemon}
+                onClick={() => handleCatchPokemon(pokemon)}
+                disabled={loading}
               >
                 {loading ? `Catching ${pokemon.name}...` : "Catch!"}
               </Button>
@@ -206,12 +123,7 @@ export async function getServerSideProps(appContext) {
   };
 }
 
-function mapStateToProps(state) {
-  const { cartId, user } = state;
-  return { cartId, user };
-}
-
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ dispatchCatchPokemon: catchPokemon, dispatchShowAlert: showAlert }, dispatch);
+  bindActionCreators({ dispatchShowAlert: showAlert }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(PokemonDetail);
+export default connect(null, mapDispatchToProps)(PokemonDetail);
