@@ -60,6 +60,9 @@ function MyApp(props) {
             <Layout>
               { loading ? <LinearProgress/> : <Component {...pageProps} />}
             </Layout>
+            <p style={{ textAlign: "center"}}>
+              Created by <a href="https://linkedin.com/in/krismp" target="_blank">krismp</a>
+            </p>
           </ThemeProvider>
         </React.Fragment>
       </PersistGate>
