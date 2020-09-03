@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import Grid from "@material-ui/core/Grid";
 import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
@@ -53,63 +52,63 @@ function PokemonDetail(props) {
     }, 3000);
   }
 
-  return (
-    <Card>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          alt={pokemon.name}
-          image={getPokemonImage(pokemon.id)}
-          title={pokemon.name}
-          className={classes.media}
-          height="50%"
-        />
-        <CardContent>
-          <Grid
-            container
-            direction="column"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Grid item>
-              <Typography gutterBottom variant="h5" component="h2">
-                {pokemon.name.toUpperCase()}
-              </Typography>
+  return (<Grid
+    container
+    direction="column"
+    justify="space-between"
+    alignItems="center"
+    spacing={3}
+  >
+    <Grid item>
+      <Card>
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            alt={pokemon.name}
+            image={getPokemonImage(pokemon.id)}
+            title={pokemon.name}
+            className={classes.media}
+            height="50%"
+          />
+          <CardContent>
+            <Grid
+              container
+              direction="column"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Grid item>
+                <Typography gutterBottom variant="h5" component="h2">
+                  {pokemon.name.toUpperCase()}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <PokemonInfo pokemon={pokemon} />
+              </Grid>
             </Grid>
-            <Grid item>
-              <PokemonInfo pokemon={pokemon} />
-            </Grid>
-          </Grid>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {pokemon.detail}
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Grid
-            container
-            direction="row"
-            justify="flex-end"
-            alignItems="center"
-          >
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                startIcon={
-                  loading ? <HourglassEmptyIcon /> : <CropFreeIcon />
-                }
-                onClick={() => handleCatchPokemon(pokemon)}
-                disabled={loading}
-              >
-                {loading ? `Catching ${pokemon.name}...` : "Catch!"}
-              </Button>
-            </Grid>
-          </Grid>
-        </CardActions>
-      </CardActionArea>
-    </Card>
-  );
+            <Typography variant="body2" color="textSecondary" component="p">
+              {pokemon.detail}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Grid>
+    <Grid item>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        fullWidth={true}
+        startIcon={
+          loading ? <HourglassEmptyIcon /> : <CropFreeIcon />
+        }
+        onClick={() => handleCatchPokemon(pokemon)}
+        disabled={loading}
+      >
+        {loading ? `Catching ${pokemon.name}...` : "Catch!"}
+      </Button>
+    </Grid>
+  </Grid>);
 }
 
 export async function getServerSideProps(appContext) {
