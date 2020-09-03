@@ -35,7 +35,7 @@ function Index({ pokemons }) {
   );
 };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const json = await getPokemons();
 
   return {

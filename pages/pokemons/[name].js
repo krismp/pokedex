@@ -12,7 +12,7 @@ import { bindActionCreators } from "redux";
 import { showAlert } from "../../store";
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
-import { getPokemonDetail, postCatchPokemon, getPokemonImage } from "../../lib/api";
+import { getPokemons, getPokemonDetail, postCatchPokemon, getPokemonImage } from "../../lib/api";
 import PokemonInfo from "../../components/PokemonInfo";
 
 const useStyles = makeStyles((theme) => ({
@@ -111,9 +111,18 @@ function PokemonDetail(props) {
   </Grid>);
 }
 
-export async function getServerSideProps(appContext) {
-  const { name } = appContext.query;
-  const json = await getPokemonDetail(name);
+export async function getStaticPaths() {
+  const json = await getPokemons();
+
+  const paths = json.results.map(res => ({
+    params: { name: res.name },
+  }))
+
+  return { paths, fallback: false }
+}
+
+export async function getStaticProps({ params }) {
+  const json = await getPokemonDetail(params.name);
 
   return {
     props: {
